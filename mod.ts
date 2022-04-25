@@ -12,7 +12,7 @@ const tag = new TextDecoder().decode(describeTag.stdout);
 const { status, stdout, stderr } = await Deno.spawn("git", {
   args: [
     "log",
-    '--pretty=format:"NEWCOMMIT %B"', // Print commit message and body, add NEWCOMMIT separator for easier commit parsing.
+    '--pretty=format:"COMMIT %B"', // Print commit message and body, add NEWCOMMIT separator for easier commit parsing.
     `${tag.replace(/\s/g, "")}..HEAD`,
   ],
 });
@@ -22,13 +22,7 @@ if (!status.success) {
   throw new Error(`subprocess failed: ${err}`);
 }
 
-// <type>[optional scope]: <description>
-
-// [optional body]
-
-// [optional footer(s)]
-
-const commits = new TextDecoder().decode(stdout).split("NEWCOMMIT");
+const commits = new TextDecoder().decode(stdout).split("COMMIT");
 
 const re =
   /^ ?(?<type>build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test|¯\\_\(ツ\)_\/¯)(?<scope>\(\w+\)?((?=:\s)|(?=!:\s)))?(?<breaking>!)?(?<subject>:\s.*)?|^(?<merge>Merge \w+)/;
