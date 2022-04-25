@@ -12,7 +12,7 @@ const tag = new TextDecoder().decode(describeTag.stdout);
 const { status, stdout, stderr } = await Deno.spawn("git", {
   args: [
     "log",
-    '--pretty=format:"%s"', // print commit message only
+    '--pretty=format:"NEWCOMMIT %B"', // Print commit message and body, add NEWCOMMIT separator for easier commit parsing.
     `${tag.replace(/\s/g, "")}..HEAD`,
   ],
 });
@@ -28,21 +28,57 @@ if (!status.success) {
 
 // [optional footer(s)]
 
-const commits = new TextDecoder().decode(stdout).split("\n");
+const commits = new TextDecoder().decode(stdout).split("NEWCOMMIT");
 
-// split commit by newline, get first and last element?
+const re =
+  /^ ?(?<type>build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test|¯\\_\(ツ\)_\/¯)(?<scope>\(\w+\)?((?=:\s)|(?=!:\s)))?(?<breaking>!)?(?<subject>:\s.*)?|^(?<merge>Merge \w+)/;
 
-const conventialCommitRegex =
-  /^"(?<type>\w+?)(?<scope>\(\w*?\))?(?<breaking>!)?:(?<desc>.*?)$(?:\n\n(?<body>.*))?(?:$\n\n(?<footer>.*)$)?/ms;
-
-for (const commit of commits) {
-  console.log(commit.split("\n"));
-  const lines = commit.split("\n");
-
-  const header = lines[0];
-  const footer = lines[lines.length - 1];
-
-  const patchCommit = commit.match(conventialCommitRegex);
-
-  // console.log(patchCommit);
+enum Increment {
+  Major,
+  Minor,
+  Patch,
 }
+
+const kinds: Increment[] = [];
+for (const commit of commits) {
+  const lines = commit.split("\n\n");
+
+  const desc = lines[0].match(re);
+  console.log(desc);
+
+  if (!desc || !desc.groups) {
+    continue;
+  }
+
+  if (desc.groups.breaking) {
+    kinds.push(Increment.Major);
+  } else if (
+    lines.length > 1 && /BREAKING[- ]CHANGE/.test(lines[lines.length - 1])
+  ) {
+    kinds.push(Increment.Major);
+  } else if (desc.groups.type === "feat") {
+    kinds.push(Increment.Minor);
+  } else {
+    kinds.push(Increment.Patch);
+  }
+}
+
+const highest = kinds.reduce((prev, curr) => {
+  if (curr === Increment.Major || curr === prev) {
+    return curr;
+  }
+  if (curr === Increment.Minor && prev === Increment.Patch) {
+    return curr;
+  }
+  if (curr === Increment.Minor && prev === Increment.Major) {
+    return curr;
+  }
+  if (curr === Increment.Patch && prev === Increment.Minor) {
+    return prev;
+  }
+  if (curr === Increment.Patch && prev === Increment.Major) {
+    return prev;
+  }
+
+  return curr;
+});
