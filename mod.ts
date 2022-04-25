@@ -7,13 +7,17 @@ const describeTag = await Deno.spawn("git", {
   ],
 });
 
-const tag = new TextDecoder().decode(describeTag.stdout);
+let tag = new TextDecoder().decode(describeTag.stdout);
+
+if (!tag) throw new Error("No tag found in repository.");
+
+tag = tag.replace(/\s/g, "");
 
 const { status, stdout, stderr } = await Deno.spawn("git", {
   args: [
     "log",
     '--pretty=format:"COMMIT %B"', // Print commit message and body, add NEWCOMMIT separator for easier commit parsing.
-    `${tag.replace(/\s/g, "")}..HEAD`,
+    `${tag}..HEAD`,
   ],
 });
 
@@ -38,7 +42,6 @@ for (const commit of commits) {
   const lines = commit.split("\n\n");
 
   const desc = lines[0].match(re);
-  console.log(desc);
 
   if (!desc || !desc.groups) {
     continue;
@@ -76,3 +79,31 @@ const highest = kinds.reduce((prev, curr) => {
 
   return curr;
 });
+
+const semver = tag.match(
+  /^(?<v>v)?(?<major>\d{1,4})\.(?<minor>\d{1,4})\.(?<patch>\d{1,4})$/,
+);
+if (!semver || !semver.groups) {
+  throw new Error("Tag has invalid or unsupported format (semver)");
+}
+
+let nextVersion;
+if (highest === Increment.Patch) {
+  nextVersion =
+    `${semver.groups.v}${semver.groups.major}.${semver.groups.minor}.${
+      (parseInt(semver.groups.patch) + 1).toString()
+    }`;
+} else if (highest === Increment.Minor) {
+  nextVersion = `${semver.groups.v}${semver.groups.major}.${
+    (parseInt(semver.groups.minor) + 1).toString()
+  }}.${semver.groups.patch}`;
+} else if (highest === Increment.Major) {
+  nextVersion = `${semver.groups.v}${
+    (parseInt(semver.groups.major) + 1).toString()
+  }.${semver.groups.minor}.${semver.groups.patch}`;
+}
+
+console.log(nextVersion);
+
+// v2.5.0
+// v2.5.0-alpha.0
