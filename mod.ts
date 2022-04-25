@@ -37,7 +37,12 @@ const conventialCommitRegex =
 
 for (const commit of commits) {
   console.log(commit.split("\n"));
+  const lines = commit.split("\n");
+
+  const header = lines[0];
+  const footer = lines[lines.length - 1];
+
   const patchCommit = commit.match(conventialCommitRegex);
 
-  //console.log(patchCommit);
+  // console.log(patchCommit);
 }
