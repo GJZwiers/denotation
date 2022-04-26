@@ -68,7 +68,7 @@ const highest = kinds.reduce((prev, curr) => {
     return curr;
   }
   if (curr === Increment.Minor && prev === Increment.Major) {
-    return curr;
+    return prev;
   }
   if (curr === Increment.Patch && prev === Increment.Minor) {
     return prev;
