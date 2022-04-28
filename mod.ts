@@ -91,7 +91,7 @@ if (increment === VersionIncrement.Patch) {
 } else if (increment === VersionIncrement.Minor) {
   nextVersion = `${semver.groups.v}${semver.groups.major}.${
     (parseInt(semver.groups.minor) + 1).toString()
-  }}.${semver.groups.patch}`;
+  }.${semver.groups.patch}`;
 } else if (increment === VersionIncrement.Major) {
   nextVersion = `${semver.groups.v}${
     (parseInt(semver.groups.major) + 1).toString()
