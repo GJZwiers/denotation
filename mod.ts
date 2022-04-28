@@ -30,7 +30,6 @@ enum VersionIncrement {
 }
 
 const commits = decoder.decode(gitLogStdout).split("COMMIT");
-console.log(commits);
 
 const re =
   /^ ?(?<type>build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test|¯\\_\(ツ\)_\/¯)(?<scope>\(\w+\)?((?=:\s)|(?=!:\s)))?(?<breaking>!)?(?<subject>:\s.*)?|^(?<merge>Merge \w+)/;
