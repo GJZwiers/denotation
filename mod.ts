@@ -54,7 +54,7 @@ const increments: VersionIncrement[] = commits.map((commit) => {
     return VersionIncrement.Patch;
   }
 });
-
+ 
 const increment = increments.reduce((prev, curr) => {
   if (curr === undefined) return curr;
 
