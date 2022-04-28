@@ -1,79 +1,74 @@
-const describeTag = await Deno.spawn("git", {
-  args: [
-    "describe",
-    "--tags",
-    "--abbrev=0",
-    "HEAD^",
-  ],
-});
+import { writeAll } from "https://deno.land/std@0.136.0/streams/mod.ts";
+import { spawnProcess } from "./spawnProcess.ts";
 
-let tag = new TextDecoder().decode(describeTag.stdout);
+const gitDescribeStdout = await spawnProcess("git", [
+  "describe",
+  "--tags",
+  "--abbrev=0",
+  "HEAD^",
+]);
 
-if (!tag) throw new Error("No tag found in repository.");
+const decoder = new TextDecoder();
+let tag = decoder.decode(gitDescribeStdout);
 
+if (!tag) {
+  throw new Error("No tag found in repository.");
+}
 tag = tag.replace(/\s/g, "");
 
-const { status, stdout, stderr } = await Deno.spawn("git", {
-  args: [
-    "log",
-    '--pretty=format:"COMMIT %B"', // Print commit message and body, add NEWCOMMIT separator for easier commit parsing.
-    `${tag}..HEAD`,
-  ],
-});
+const gitLogStdout = await spawnProcess("git", [
+  "log",
+  '--pretty=format:"COMMIT %B"', // Print commit message and body, add COMMIT separator for easier commit parsing.
+  `${tag}..HEAD`,
+]);
 
-if (!status.success) {
-  const err = new TextDecoder().decode(stderr);
-  throw new Error(`subprocess failed: ${err}`);
+enum VersionIncrement {
+  Major,
+  Minor,
+  Patch,
+  Unconventional,
 }
 
-const commits = new TextDecoder().decode(stdout).split("COMMIT");
+const commits = decoder.decode(gitLogStdout).split("COMMIT");
+console.log(commits);
 
 const re =
   /^ ?(?<type>build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test|¯\\_\(ツ\)_\/¯)(?<scope>\(\w+\)?((?=:\s)|(?=!:\s)))?(?<breaking>!)?(?<subject>:\s.*)?|^(?<merge>Merge \w+)/;
 
-enum Increment {
-  Major,
-  Minor,
-  Patch,
-}
-
-const kinds: Increment[] = [];
-for (const commit of commits) {
+const increments: VersionIncrement[] = commits.map((commit) => {
   const lines = commit.split("\n\n");
+  const convCommitHeader = lines[0].match(re);
 
-  const desc = lines[0].match(re);
-
-  if (!desc || !desc.groups) {
-    continue;
+  if (!convCommitHeader || !convCommitHeader.groups) {
+    return VersionIncrement.Unconventional;
   }
 
-  if (desc.groups.breaking) {
-    kinds.push(Increment.Major);
-  } else if (
-    lines.length > 1 && /BREAKING[- ]CHANGE/.test(lines[lines.length - 1])
-  ) {
-    kinds.push(Increment.Major);
-  } else if (desc.groups.type === "feat") {
-    kinds.push(Increment.Minor);
+  const footer = lines[lines.length - 1];
+  if (convCommitHeader.groups.breaking) {
+    return VersionIncrement.Major;
+  } else if (lines.length > 1 && /BREAKING[- ]CHANGE/.test(footer)) {
+    return VersionIncrement.Major;
+  } else if (convCommitHeader.groups.type === "feat") {
+    return VersionIncrement.Minor;
   } else {
-    kinds.push(Increment.Patch);
+    return VersionIncrement.Patch;
   }
-}
+});
 
-const highest = kinds.reduce((prev, curr) => {
-  if (curr === Increment.Major || curr === prev) {
+const increment = increments.reduce((prev, curr) => {
+  if (curr === VersionIncrement.Major || curr === prev) {
     return curr;
   }
-  if (curr === Increment.Minor && prev === Increment.Patch) {
+  if (curr === VersionIncrement.Minor && prev === VersionIncrement.Patch) {
     return curr;
   }
-  if (curr === Increment.Minor && prev === Increment.Major) {
+  if (curr === VersionIncrement.Minor && prev === VersionIncrement.Major) {
     return prev;
   }
-  if (curr === Increment.Patch && prev === Increment.Minor) {
+  if (curr === VersionIncrement.Patch && prev === VersionIncrement.Minor) {
     return prev;
   }
-  if (curr === Increment.Patch && prev === Increment.Major) {
+  if (curr === VersionIncrement.Patch && prev === VersionIncrement.Major) {
     return prev;
   }
 
@@ -84,26 +79,31 @@ const semver = tag.match(
   /^(?<v>v)?(?<major>\d{1,4})\.(?<minor>\d{1,4})\.(?<patch>\d{1,4})$/,
 );
 if (!semver || !semver.groups) {
-  throw new Error("Tag has invalid or unsupported format (semver)");
+  throw new Error(`Invalid semantic versioning format for tag: ${tag}`);
 }
 
 let nextVersion;
-if (highest === Increment.Patch) {
+if (increment === VersionIncrement.Patch) {
   nextVersion =
     `${semver.groups.v}${semver.groups.major}.${semver.groups.minor}.${
       (parseInt(semver.groups.patch) + 1).toString()
     }`;
-} else if (highest === Increment.Minor) {
+} else if (increment === VersionIncrement.Minor) {
   nextVersion = `${semver.groups.v}${semver.groups.major}.${
     (parseInt(semver.groups.minor) + 1).toString()
   }}.${semver.groups.patch}`;
-} else if (highest === Increment.Major) {
+} else if (increment === VersionIncrement.Major) {
   nextVersion = `${semver.groups.v}${
     (parseInt(semver.groups.major) + 1).toString()
   }.${semver.groups.minor}.${semver.groups.patch}`;
 }
 
-console.log(nextVersion);
+if (!nextVersion) {
+  throw new Error(
+    "Something went wrong determining the next semantic version.",
+  );
+}
 
-// v2.5.0
+await writeAll(Deno.stdout, new TextEncoder().encode(nextVersion));
+
 // v2.5.0-alpha.0
