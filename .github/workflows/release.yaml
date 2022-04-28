@@ -11,10 +11,13 @@ jobs:
           - ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
       - uses: denoland/setup-deno@v1.1.0
         with:
           deno-version: v1.x.x
       - run: |
-          $TAG=$(deno run --allow-run=git --unstable mod.ts)
+          TAG=$(deno run --allow-run=git --unstable mod.ts)
           echo $TAG
+          gh release create $TAG --generate-notes
 

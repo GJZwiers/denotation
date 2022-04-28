@@ -30,7 +30,6 @@ enum VersionIncrement {
 }
 
 const commits = decoder.decode(gitLogStdout).split("COMMIT");
-console.log(commits);
 
 const re =
   /^ ?(?<type>build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test|¯\\_\(ツ\)_\/¯)(?<scope>\(\w+\)?((?=:\s)|(?=!:\s)))?(?<breaking>!)?(?<subject>:\s.*)?|^(?<merge>Merge \w+)/;
@@ -91,7 +90,7 @@ if (increment === VersionIncrement.Patch) {
 } else if (increment === VersionIncrement.Minor) {
   nextVersion = `${semver.groups.v}${semver.groups.major}.${
     (parseInt(semver.groups.minor) + 1).toString()
-  }}.${semver.groups.patch}`;
+  }.${semver.groups.patch}`;
 } else if (increment === VersionIncrement.Major) {
   nextVersion = `${semver.groups.v}${
     (parseInt(semver.groups.major) + 1).toString()
