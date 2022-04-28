@@ -19,4 +19,5 @@ jobs:
       - run: |
           TAG=$(deno run --allow-run=git --unstable mod.ts)
           echo $TAG
+          gh release create $TAG --generate-notes
 
