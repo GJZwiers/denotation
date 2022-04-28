@@ -32,7 +32,6 @@ enum VersionIncrement {
 const commits = decoder.decode(gitLogStdout).split("COMMIT");
 console.log(commits);
 
-
 const re =
   /^ ?(?<type>build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test|¯\\_\(ツ\)_\/¯)(?<scope>\(\w+\)?((?=:\s)|(?=!:\s)))?(?<breaking>!)?(?<subject>:\s.*)?|^(?<merge>Merge \w+)/;
 
@@ -55,7 +54,7 @@ const increments: VersionIncrement[] = commits.map((commit) => {
     return VersionIncrement.Patch;
   }
 });
- 
+
 const increment = increments.reduce((prev, curr) => {
   if (curr === VersionIncrement.Major || curr === prev) {
     return curr;
@@ -80,7 +79,7 @@ const semver = tag.match(
   /^(?<v>v)?(?<major>\d{1,4})\.(?<minor>\d{1,4})\.(?<patch>\d{1,4})$/,
 );
 if (!semver || !semver.groups) {
-  throw new Error("Tag has invalid or unsupported format (semver)");
+  throw new Error(`Invalid semantic versioning format for tag: ${tag}`);
 }
 
 let nextVersion;
@@ -100,7 +99,9 @@ if (increment === VersionIncrement.Patch) {
 }
 
 if (!nextVersion) {
-  throw new Error("Something went wrong determining the next semantic version");
+  throw new Error(
+    "Something went wrong determining the next semantic version.",
+  );
 }
 
 await writeAll(Deno.stdout, new TextEncoder().encode(nextVersion));
