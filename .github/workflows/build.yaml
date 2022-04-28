@@ -17,4 +17,3 @@ jobs:
       - run: deno fmt --check
       - run: deno lint
       - run: deno test --allow-run=deno --unstable
-      

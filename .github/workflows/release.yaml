@@ -1,0 +1,19 @@
+name: release
+
+on: workflow_dispatch
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os:
+          - ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - uses: denoland/setup-deno@v1.1.0
+        with:
+          deno-version: v1.x.x
+      - run: |
+          $TAG=deno run --allow-run=git --unstable mod.ts
+          echo $TAG
