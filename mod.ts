@@ -105,5 +105,4 @@ if (!nextVersion) {
 
 await writeAll(Deno.stdout, new TextEncoder().encode(nextVersion));
 
-// v2.5.0
 // v2.5.0-alpha.0
