@@ -2,6 +2,9 @@ name: release
 
 on: workflow_dispatch
 
+env:
+  GH_TOKEN: $
+
 jobs:
   build:
     runs-on: ${{ matrix.os }}
@@ -20,4 +23,3 @@ jobs:
           TAG=$(deno run --allow-run=git --unstable mod.ts)
           echo $TAG
           gh release create $TAG --generate-notes
-
