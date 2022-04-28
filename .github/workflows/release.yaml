@@ -17,3 +17,4 @@ jobs:
       - run: |
           $TAG=$(deno run --allow-run=git --unstable mod.ts)
           echo $TAG
+
