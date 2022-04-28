@@ -3,7 +3,7 @@ name: release
 on: workflow_dispatch
 
 env:
-  GH_TOKEN: $
+  GITHUB_TOKEN: ${{ secrets.TOKEN }}
 
 jobs:
   build:
@@ -22,6 +22,5 @@ jobs:
       - run: |
           TAG=$(deno run --allow-run=git --unstable mod.ts)
           echo $TAG
-          gh auth login
           gh release create $TAG --generate-notes
           
