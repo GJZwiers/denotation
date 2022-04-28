@@ -99,7 +99,6 @@ if (increment === VersionIncrement.Patch) {
   }.${semver.groups.minor}.${semver.groups.patch}`;
 }
 
-console.log(nextVersion);
 if (!nextVersion) {
   throw new Error("Something went wrong determining the next semantic version");
 }
@@ -108,4 +107,3 @@ await writeAll(Deno.stdout, new TextEncoder().encode(nextVersion));
 
 // v2.5.0
 // v2.5.0-alpha.0
-
