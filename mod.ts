@@ -26,9 +26,12 @@ enum VersionIncrement {
   Major,
   Minor,
   Patch,
+  Unconventional,
 }
 
 const commits = decoder.decode(gitLogStdout).split("COMMIT");
+console.log(commits);
+
 
 const re =
   /^ ?(?<type>build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test|¯\\_\(ツ\)_\/¯)(?<scope>\(\w+\)?((?=:\s)|(?=!:\s)))?(?<breaking>!)?(?<subject>:\s.*)?|^(?<merge>Merge \w+)/;
@@ -38,9 +41,7 @@ const increments: VersionIncrement[] = commits.map((commit) => {
   const convCommitHeader = lines[0].match(re);
 
   if (!convCommitHeader || !convCommitHeader.groups) {
-    throw new Error(
-      `Found commit with invalid conventional commit syntax: ${convCommitHeader}`,
-    );
+    return VersionIncrement.Unconventional;
   }
 
   const footer = lines[lines.length - 1];
@@ -56,8 +57,6 @@ const increments: VersionIncrement[] = commits.map((commit) => {
 });
  
 const increment = increments.reduce((prev, curr) => {
-  if (curr === undefined) return curr;
-
   if (curr === VersionIncrement.Major || curr === prev) {
     return curr;
   }
