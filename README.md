@@ -27,7 +27,7 @@ together with the GitHub CLI to make a release:
 
 ```yaml
 - run: |
-    TAG=$(deno run --allow-run=git --unstable mod.ts)
+    TAG=$(deno run --allow-run=git --unstable https://deno.land/x/denotation@v0.1.1/mod.ts)
     gh release create $TAG --generate-notes
   env:
     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
