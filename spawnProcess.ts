@@ -8,7 +8,7 @@ export async function spawnProcess(
 
   if (!status.success) {
     const err = new TextDecoder().decode(stderr);
-    throw new Error(`git describe operation failed: ${err}`);
+    throw new Error(`${command} failed: ${err}`);
   }
 
   return stdout;
