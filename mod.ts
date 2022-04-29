@@ -1,4 +1,4 @@
-import { writeAll } from "https://deno.land/std@0.136.0/streams/mod.ts";
+import { writeAll } from "./deps.ts";
 import { spawnProcess } from "./spawnProcess.ts";
 
 const gitDescribeStdout = await spawnProcess("git", [
