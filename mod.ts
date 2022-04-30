@@ -103,6 +103,13 @@ if (!nextVersion) {
   );
 }
 
-await writeAll(Deno.stdout, new TextEncoder().encode(nextVersion));
+// gh release create --draft --generate-notes $TAG
+await spawnProcess("gh", [
+  "release",
+  "create",
+  "--draft",
+  "--generate-notes",
+  nextVersion,
+]);
 
-// v2.5.0-alpha.0
+await writeAll(Deno.stdout, new TextEncoder().encode(nextVersion));
