@@ -1,4 +1,5 @@
 import { writeAll } from "./deps.ts";
+import { highestIncrement, VersionIncrement } from "./incrementVersion.ts";
 import { spawnProcess } from "./spawnProcess.ts";
 
 const gitDescribeStdout = await spawnProcess("git", [
@@ -16,20 +17,16 @@ if (!tag) {
 }
 tag = tag.replace(/\s/g, "");
 
+const commitSeparator = "COMMIT ";
 const gitLogStdout = await spawnProcess("git", [
   "log",
-  '--pretty=format:"COMMIT %B"', // Print commit message and body, add COMMIT separator for easier commit parsing.
+  `--pretty=format:${commitSeparator}%B`, // Print commit message and body, add COMMIT separator for easier commit parsing.
   `${tag}..HEAD`,
 ]);
 
-enum VersionIncrement {
-  Major,
-  Minor,
-  Patch,
-  Unconventional,
-}
-
-const commits = decoder.decode(gitLogStdout).split("COMMIT");
+const commits = decoder.decode(gitLogStdout)
+  .split(commitSeparator)
+  .filter((element) => element); // Filter empty strings.
 
 const re =
   /^ ?(?<type>build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test|¯\\_\(ツ\)_\/¯)(?<scope>\(\w+\)?((?=:\s)|(?=!:\s)))?(?<breaking>!)?(?<subject>:\s.*)?|^(?<merge>Merge \w+)/;
@@ -39,7 +36,9 @@ const increments: VersionIncrement[] = commits.map((commit) => {
   const convCommitHeader = lines[0].match(re);
 
   if (!convCommitHeader || !convCommitHeader.groups) {
-    return VersionIncrement.Unconventional;
+    throw new Error(
+      `Found commit with invalid conventional commit format: ${convCommitHeader}`,
+    );
   }
 
   const footer = lines[lines.length - 1];
@@ -54,25 +53,7 @@ const increments: VersionIncrement[] = commits.map((commit) => {
   }
 });
 
-const increment = increments.reduce((prev, curr) => {
-  if (curr === VersionIncrement.Major || curr === prev) {
-    return curr;
-  }
-  if (curr === VersionIncrement.Minor && prev === VersionIncrement.Patch) {
-    return curr;
-  }
-  if (curr === VersionIncrement.Minor && prev === VersionIncrement.Major) {
-    return prev;
-  }
-  if (curr === VersionIncrement.Patch && prev === VersionIncrement.Minor) {
-    return prev;
-  }
-  if (curr === VersionIncrement.Patch && prev === VersionIncrement.Major) {
-    return prev;
-  }
-
-  return curr;
-});
+const increment = increments.reduce(highestIncrement);
 
 const semver = tag.match(
   /^(?<v>v)?(?<major>\d{1,4})\.(?<minor>\d{1,4})\.(?<patch>\d{1,4})$/,
