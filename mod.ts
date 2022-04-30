@@ -1,4 +1,5 @@
 import { writeAll } from "./deps.ts";
+import { highestIncrement, VersionIncrement } from "./incrementVersion.ts";
 import { spawnProcess } from "./spawnProcess.ts";
 
 const gitDescribeStdout = await spawnProcess("git", [
@@ -22,13 +23,6 @@ const gitLogStdout = await spawnProcess("git", [
   `${tag}..HEAD`,
 ]);
 
-enum VersionIncrement {
-  Major,
-  Minor,
-  Patch,
-  Unconventional,
-}
-
 const commits = decoder.decode(gitLogStdout).split("COMMIT");
 
 const re =
@@ -39,7 +33,7 @@ const increments: VersionIncrement[] = commits.map((commit) => {
   const convCommitHeader = lines[0].match(re);
 
   if (!convCommitHeader || !convCommitHeader.groups) {
-    return VersionIncrement.Unconventional;
+    return VersionIncrement.Patch
   }
 
   const footer = lines[lines.length - 1];
@@ -54,25 +48,7 @@ const increments: VersionIncrement[] = commits.map((commit) => {
   }
 });
 
-const increment = increments.reduce((prev, curr) => {
-  if (curr === VersionIncrement.Major || curr === prev) {
-    return curr;
-  }
-  if (curr === VersionIncrement.Minor && prev === VersionIncrement.Patch) {
-    return curr;
-  }
-  if (curr === VersionIncrement.Minor && prev === VersionIncrement.Major) {
-    return prev;
-  }
-  if (curr === VersionIncrement.Patch && prev === VersionIncrement.Minor) {
-    return prev;
-  }
-  if (curr === VersionIncrement.Patch && prev === VersionIncrement.Major) {
-    return prev;
-  }
-
-  return curr;
-});
+const increment = increments.reduce(highestIncrement);
 
 const semver = tag.match(
   /^(?<v>v)?(?<major>\d{1,4})\.(?<minor>\d{1,4})\.(?<patch>\d{1,4})$/,
