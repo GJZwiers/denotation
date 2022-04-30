@@ -35,7 +35,9 @@ const increments: VersionIncrement[] = commits.map((commit) => {
   const convCommitHeader = lines[0].match(re);
 
   if (!convCommitHeader || !convCommitHeader.groups) {
-    throw new Error(`Found commit with invalid conventional commit format: ${convCommitHeader}`);
+    throw new Error(
+      `Found commit with invalid conventional commit format: ${convCommitHeader}`,
+    );
   }
 
   const footer = lines[lines.length - 1];
