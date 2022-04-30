@@ -19,13 +19,13 @@ tag = tag.replace(/\s/g, "");
 
 const gitLogStdout = await spawnProcess("git", [
   "log",
-  '--pretty=format:COMMIT %B', // Print commit message and body, add COMMIT separator for easier commit parsing.
+  "--pretty=format:COMMIT %B", // Print commit message and body, add COMMIT separator for easier commit parsing.
   `${tag}..HEAD`,
 ]);
 
 const commits = decoder.decode(gitLogStdout)
   .split("COMMIT ")
-  .filter((element) => element);  // Filter empty strings.
+  .filter((element) => element); // Filter empty strings.
 
 const re =
   /^ ?(?<type>build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test|¯\\_\(ツ\)_\/¯)(?<scope>\(\w+\)?((?=:\s)|(?=!:\s)))?(?<breaking>!)?(?<subject>:\s.*)?|^(?<merge>Merge \w+)/;
@@ -35,7 +35,7 @@ const increments: VersionIncrement[] = commits.map((commit) => {
   const convCommitHeader = lines[0].match(re);
 
   if (!convCommitHeader || !convCommitHeader.groups) {
-    return VersionIncrement.Patch
+    return VersionIncrement.Patch;
   }
 
   const footer = lines[lines.length - 1];
