@@ -3,22 +3,15 @@ name: release
 on: workflow_dispatch
 
 jobs:
-  build:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os:
-          - ubuntu-20.04
+  release:
+    runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
       - uses: denoland/setup-deno@v1.1.0
         with:
           deno-version: v1.x.x
-      - run: |
-          TAG=$(deno run --allow-run=git --unstable mod.ts)
-          echo $TAG
-          gh release create $TAG --generate-notes
+      - run: deno run --allow-run='gh,git' --unstable mod.ts
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

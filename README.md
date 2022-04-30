@@ -14,7 +14,7 @@ pipeline.
 
 ## Usage
 
-`deno run --allow-run=git --unstable https://deno.land/x/denotation@v0.1.1/mod.ts`
+`deno run --allow-run=git --unstable https://deno.land/x/denotation@v0.2.0/mod.ts`
 
 This will run the script and look at the commits made since the last git tag,
 for example `v1.0.0`. Depending on the conventional commit messages it will
@@ -26,11 +26,23 @@ The following example shows how to use `denotation` as a step in GitHub Actions
 together with the GitHub CLI to make a release:
 
 ```yaml
-- run: |
-    TAG=$(deno run --allow-run=git --unstable https://deno.land/x/denotation@v0.1.1/mod.ts)
-    gh release create $TAG --generate-notes
-  env:
-    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+name: release
+
+on: workflow_dispatch
+
+jobs:
+  release:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - uses: denoland/setup-deno@v1.1.0
+        with:
+          deno-version: v1.x.x
+      - run: deno run --allow-run='gh,git' --unstable https://deno.land/x/denotation@v0.2.0/mod.ts
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
 
 ## Contributing
