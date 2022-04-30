@@ -35,7 +35,7 @@ const increments: VersionIncrement[] = commits.map((commit) => {
   const convCommitHeader = lines[0].match(re);
 
   if (!convCommitHeader || !convCommitHeader.groups) {
-    return VersionIncrement.Patch;
+    throw new Error(`Found commit with invalid conventional commit format: ${convCommitHeader}`);
   }
 
   const footer = lines[lines.length - 1];
@@ -82,12 +82,12 @@ if (!nextVersion) {
 }
 
 // gh release create --draft --generate-notes $TAG
-// await spawnProcess("gh", [
-//   "release",
-//   "create",
-//   "--draft",
-//   "--generate-notes",
-//   nextVersion,
-// ]);
+await spawnProcess("gh", [
+  "release",
+  "create",
+  "--draft",
+  "--generate-notes",
+  nextVersion,
+]);
 
 await writeAll(Deno.stdout, new TextEncoder().encode(nextVersion));
