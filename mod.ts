@@ -17,14 +17,15 @@ if (!tag) {
 }
 tag = tag.replace(/\s/g, "");
 
+const commitSeparator = "COMMIT ";
 const gitLogStdout = await spawnProcess("git", [
   "log",
-  "--pretty=format:COMMIT %B", // Print commit message and body, add COMMIT separator for easier commit parsing.
+  `--pretty=format:${commitSeparator}%B`, // Print commit message and body, add COMMIT separator for easier commit parsing.
   `${tag}..HEAD`,
 ]);
 
 const commits = decoder.decode(gitLogStdout)
-  .split("COMMIT ")
+  .split(commitSeparator)
   .filter((element) => element); // Filter empty strings.
 
 const re =
