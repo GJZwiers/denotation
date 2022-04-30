@@ -19,11 +19,13 @@ tag = tag.replace(/\s/g, "");
 
 const gitLogStdout = await spawnProcess("git", [
   "log",
-  '--pretty=format:"COMMIT %B"', // Print commit message and body, add COMMIT separator for easier commit parsing.
+  '--pretty=format:COMMIT %B', // Print commit message and body, add COMMIT separator for easier commit parsing.
   `${tag}..HEAD`,
 ]);
 
-const commits = decoder.decode(gitLogStdout).split("COMMIT");
+const commits = decoder.decode(gitLogStdout)
+  .split("COMMIT ")
+  .filter((element) => element);  // Filter empty strings.
 
 const re =
   /^ ?(?<type>build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test|¯\\_\(ツ\)_\/¯)(?<scope>\(\w+\)?((?=:\s)|(?=!:\s)))?(?<breaking>!)?(?<subject>:\s.*)?|^(?<merge>Merge \w+)/;
@@ -80,12 +82,12 @@ if (!nextVersion) {
 }
 
 // gh release create --draft --generate-notes $TAG
-await spawnProcess("gh", [
-  "release",
-  "create",
-  "--draft",
-  "--generate-notes",
-  nextVersion,
-]);
+// await spawnProcess("gh", [
+//   "release",
+//   "create",
+//   "--draft",
+//   "--generate-notes",
+//   nextVersion,
+// ]);
 
 await writeAll(Deno.stdout, new TextEncoder().encode(nextVersion));

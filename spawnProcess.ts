@@ -1,3 +1,4 @@
+/** Wrapper around Deno.spawn with some error handling. */
 export async function spawnProcess(
   command: string,
   args: string[],
