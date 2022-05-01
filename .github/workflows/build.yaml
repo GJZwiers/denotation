@@ -5,6 +5,7 @@ on: push
 jobs:
   build:
     runs-on: ${{ matrix.os }}
+    environment: build
     strategy:
       matrix:
         os:
