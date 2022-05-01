@@ -1,5 +1,6 @@
 import { Options } from "./cli.ts";
 import { writeAll } from "./deps.ts";
+import { getIncrementType } from "./getIncrementType.ts";
 import { highestIncrement, VersionIncrement } from "./incrementVersion.ts";
 import { nextRelease } from "./nextRelease.ts";
 import { spawnProcess } from "./spawnProcess.ts";
@@ -31,30 +32,7 @@ export async function main(options: Options) {
     .split(commitSeparator)
     .filter((element) => element); // Filter empty strings.
 
-  const re =
-    /^ ?(?<type>build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test|¯\\_\(ツ\)_\/¯)(?<scope>\(\w+\)?((?=:\s)|(?=!:\s)))?(?<breaking>!)?(?<subject>:\s.*)?|^(?<merge>Merge \w+)/;
-
-  const increments: VersionIncrement[] = commits.map((commit) => {
-    const lines = commit.split("\n\n");
-    const convCommitHeader = lines[0].match(re);
-
-    if (!convCommitHeader || !convCommitHeader.groups) {
-      throw new Error(
-        `Found commit with invalid conventional commit format: ${convCommitHeader}`,
-      );
-    }
-
-    const footer = lines[lines.length - 1];
-    if (convCommitHeader.groups.breaking) {
-      return VersionIncrement.Major;
-    } else if (lines.length > 1 && /BREAKING[- ]CHANGE/.test(footer)) {
-      return VersionIncrement.Major;
-    } else if (convCommitHeader.groups.type === "feat") {
-      return VersionIncrement.Minor;
-    } else {
-      return VersionIncrement.Patch;
-    }
-  });
+  const increments: VersionIncrement[] = commits.map(getIncrementType);
 
   const increment = increments.reduce(highestIncrement);
 
