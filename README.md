@@ -39,7 +39,7 @@ jobs:
         with:
           deno-version: v1.x.x
       - run: |
-          deno run --allow-run='gh,git' --unstable https://deno.land/x/denotation@v0.3.0/cli.ts
+          deno run --allow-run='gh,git' --unstable https://deno.land/x/denotation@v0.4.0/cli.ts
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # GitHub Actions built-in variable.
 ```
