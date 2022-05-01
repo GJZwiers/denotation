@@ -38,7 +38,8 @@ jobs:
       - uses: denoland/setup-deno@v1.1.0
         with:
           deno-version: v1.x.x
-      - run: deno run --allow-run='gh,git' --unstable https://deno.land/x/denotation@v0.2.1/mod.ts
+      - run: |
+          deno run --allow-run='gh,git' --unstable https://deno.land/x/denotation@v0.3.0/cli.ts
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # GitHub Actions built-in variable.
 ```
