@@ -58,7 +58,7 @@ export async function main(options: Options) {
 
   const increment = increments.reduce(highestIncrement);
 
-  // /^(?<v>v)?(?<major>\d{1,4})\.(?<minor>\d{1,4})\.(?<patch>\d{1,4})(?<pre>-[0-9A-Za-z-]\.)?$/
+  // Source: https://ihateregex.io/expr/semver/
   const semver = tag.match(
     /^(?<v>v)?(?<major>0|[1-9]\d*)\.(?<minor>0|[1-9]\d*)\.(?<patch>0|[1-9]\d*)(?:-(?<pre>(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?<build>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$/,
   );
@@ -66,7 +66,6 @@ export async function main(options: Options) {
     throw new Error(`Invalid semantic versioning format for tag: ${tag}`);
   }
 
-  console.log(semver);
   if (semver.groups.pre) {
     console.log(semver.groups.pre);
   }
@@ -95,13 +94,13 @@ export async function main(options: Options) {
     );
   }
 
-  // await spawnProcess("gh", [
-  //   "release",
-  //   "create",
-  //   "--draft",
-  //   "--generate-notes",
-  //   nextVersion,
-  // ]);
+  await spawnProcess("gh", [
+    "release",
+    "create",
+    "--draft",
+    "--generate-notes",
+    nextVersion,
+  ]);
 
   await writeAll(Deno.stdout, new TextEncoder().encode(nextVersion));
 }
