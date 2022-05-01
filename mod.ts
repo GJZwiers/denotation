@@ -1,9 +1,10 @@
 import { Options } from "./cli.ts";
 import { writeAll } from "./deps.ts";
 import { highestIncrement, VersionIncrement } from "./incrementVersion.ts";
+import { nextRelease } from "./nextRelease.ts";
 import { spawnProcess } from "./spawnProcess.ts";
 
-export async function main(_options: Options) {
+export async function main(options: Options) {
   const gitDescribeStdout = await spawnProcess("git", [
     "describe",
     "--tags",
@@ -57,34 +58,36 @@ export async function main(_options: Options) {
 
   const increment = increments.reduce(highestIncrement);
 
+  // /^(?<v>v)?(?<major>\d{1,4})\.(?<minor>\d{1,4})\.(?<patch>\d{1,4})(?<pre>-[0-9A-Za-z-]\.)?$/
   const semver = tag.match(
-    /^(?<v>v)?(?<major>\d{1,4})\.(?<minor>\d{1,4})\.(?<patch>\d{1,4})(?<pre>-)?$/,
+    /^(?<v>v)?(?<major>0|[1-9]\d*)\.(?<minor>0|[1-9]\d*)\.(?<patch>0|[1-9]\d*)(?:-(?<pre>(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?<build>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$/,
   );
   if (!semver || !semver.groups) {
     throw new Error(`Invalid semantic versioning format for tag: ${tag}`);
   }
 
-  // console.log(options.prerelease);
-  // TODO: handle
-  // - current re next pre
-  // - current pre next pre
-  // - current pre next re
-
-  let nextVersion;
-  if (increment === VersionIncrement.Patch) {
-    nextVersion =
-      `${semver.groups.v}${semver.groups.major}.${semver.groups.minor}.${
-        (parseInt(semver.groups.patch) + 1).toString()
-      }`;
-  } else if (increment === VersionIncrement.Minor) {
-    nextVersion = `${semver.groups.v}${semver.groups.major}.${
-      (parseInt(semver.groups.minor) + 1).toString()
-    }.0`;
-  } else if (increment === VersionIncrement.Major) {
-    nextVersion = `${semver.groups.v}${
-      (parseInt(semver.groups.major) + 1).toString()
-    }.0.0`;
+  console.log(semver);
+  if (semver.groups.pre) {
+    console.log(semver.groups.pre);
   }
+
+  enum ReleaseType {
+    Release,
+    Prerelease,
+  }
+
+  const currentReleaseType = (semver.groups.pre)
+    ? ReleaseType.Prerelease
+    : ReleaseType.Release;
+  const nextReleaseType = (options.prerelease)
+    ? ReleaseType.Prerelease
+    : ReleaseType.Release;
+
+  const nextVersion = nextRelease(semver.groups, {
+    current: currentReleaseType,
+    next: nextReleaseType,
+    increment,
+  });
 
   if (!nextVersion) {
     throw new Error(
@@ -92,13 +95,13 @@ export async function main(_options: Options) {
     );
   }
 
-  await spawnProcess("gh", [
-    "release",
-    "create",
-    "--draft",
-    "--generate-notes",
-    nextVersion,
-  ]);
+  // await spawnProcess("gh", [
+  //   "release",
+  //   "create",
+  //   "--draft",
+  //   "--generate-notes",
+  //   nextVersion,
+  // ]);
 
   await writeAll(Deno.stdout, new TextEncoder().encode(nextVersion));
 }
