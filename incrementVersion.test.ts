@@ -29,6 +29,13 @@ Deno.test("should return minor version increment if previous is a patch", () => 
   );
 });
 
+Deno.test("should return minor version increment if previous is a patch and current is minor", () => {
+  assertEquals(
+    highestIncrement(VersionIncrement.Patch, VersionIncrement.Minor),
+    VersionIncrement.Minor,
+  );
+});
+
 Deno.test("should return patch version increment if previous is a patch", () => {
   assertEquals(
     highestIncrement(VersionIncrement.Patch, VersionIncrement.Patch),
