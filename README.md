@@ -61,11 +61,21 @@ At the moment Continuous Delivery is supported where a draft release is made
 with generated release notes and some final edits can be made before publishing
 to a module registry like `deno.land/x`.
 
+## Pre-releases
+
+Currently there is support for pre-releases with the suffix `-alpha.[version]`.
+Use the `--prerelease` option to make the next release a pre-release.
+
+If you are on `v1.0.0`, and you make a `fix:` commit for example, with
+`--prerelease` the next version will become `v1.0.1-alpha.0`.
+
 ## Roadmap
 
-- Support Continuous Deployment, where release is immediate and commits with
-  certain scopes like `fix(testing)` and `feat(ci)` are automatically filtered
-  from the release notes.
+- Support Continuous Deployment, where release is immediate
+- Support filtering certain commits from release notes (such as `chore` and
+  `ci`)
+- Support custom version increments based on commit scope like `feat(ci)`
+  incrementing as a patch instead of a minor release.
 
 ## Contributing
 
