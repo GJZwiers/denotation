@@ -185,3 +185,22 @@ Deno.test("should increment version v1.0.0-alpha.0 to v2.0.0-alpha.0 if the next
 
   assertEquals(next, "v2.0.0-alpha.0");
 });
+
+Deno.test("should increment version v1.0.0-alpha.0 to v1.0.0 if the next is a release", () => {
+  const next = nextRelease(
+    {
+      v: "v",
+      major: "1",
+      minor: "0",
+      patch: "0",
+      pre: "-alpha.0",
+    },
+    {
+      current: ReleaseType.Prerelease,
+      next: ReleaseType.Release,
+      increment: VersionIncrement.Major,
+    },
+  );
+
+  assertEquals(next, "v1.0.0");
+});
