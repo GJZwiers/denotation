@@ -72,16 +72,24 @@ export async function main(options: Options) {
     );
   }
 
-  const prerelease = (options.prerelease) ? "--prerelease" : "";
+  const args = (options.prerelease)
+    ? [
+      "release",
+      "create",
+      "--prerelease",
+      "--draft",
+      "--generate-notes",
+      nextVersion,
+    ]
+    : [
+      "release",
+      "create",
+      "--draft",
+      "--generate-notes",
+      nextVersion,
+    ];
 
-  await spawnProcess("gh", [
-    "release",
-    "create",
-    prerelease,
-    "--draft",
-    "--generate-notes",
-    nextVersion,
-  ]);
+  await spawnProcess("gh", args);
 
   await writeAll(Deno.stdout, new TextEncoder().encode(nextVersion));
 }
