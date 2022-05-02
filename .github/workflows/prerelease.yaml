@@ -13,6 +13,6 @@ jobs:
       - uses: denoland/setup-deno@v1.1.0
         with:
           deno-version: v1.x.x
-      - run: deno run --allow-run='gh,git' --unstable cli.ts -- --prerelease
+      - run: deno run --allow-run='gh,git' --unstable cli.ts --prerelease
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
