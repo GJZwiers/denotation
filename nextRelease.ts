@@ -51,10 +51,10 @@ export function nextRelease(
         if (!match) {
           throw new Error("Error while matching prerelease digit");
         }
-        const prePatchNumber = match[0];
+        const prereleasePatch = match[0];
         nextVersion =
           `${groups.v}${groups.major}.${groups.minor}.${groups.patch}-alpha.${
-            (parseInt(prePatchNumber) + 1).toString()
+            (parseInt(prereleasePatch) + 1).toString()
           }`;
       }
     } else {

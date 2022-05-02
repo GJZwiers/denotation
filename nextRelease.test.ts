@@ -167,6 +167,25 @@ Deno.test("should increment version v1.0.0-alpha.1 to v1.1.0-alpha.0 if the next
   assertEquals(next, "v1.1.0-alpha.0");
 });
 
+Deno.test("should increment version v1.1.0-alpha.0 to v1.1.0-alpha.1 if the next is a patch prerelease", () => {
+  const next = nextRelease(
+    {
+      v: "v",
+      major: "1",
+      minor: "1",
+      patch: "0",
+      pre: "-alpha.0",
+    },
+    {
+      current: ReleaseType.Prerelease,
+      next: ReleaseType.Prerelease,
+      increment: VersionIncrement.Patch,
+    },
+  );
+
+  assertEquals(next, "v1.1.0-alpha.1");
+});
+
 Deno.test("should increment version v1.0.0-alpha.0 to v2.0.0-alpha.0 if the next is a major prerelease", () => {
   const next = nextRelease(
     {
@@ -184,6 +203,25 @@ Deno.test("should increment version v1.0.0-alpha.0 to v2.0.0-alpha.0 if the next
   );
 
   assertEquals(next, "v2.0.0-alpha.0");
+});
+
+Deno.test("should increment version v2.0.0-alpha.0 to v2.0.0-alpha.1 if the next is a patch prerelease", () => {
+  const next = nextRelease(
+    {
+      v: "v",
+      major: "2",
+      minor: "0",
+      patch: "0",
+      pre: "-alpha.0",
+    },
+    {
+      current: ReleaseType.Prerelease,
+      next: ReleaseType.Prerelease,
+      increment: VersionIncrement.Patch,
+    },
+  );
+
+  assertEquals(next, "v2.0.0-alpha.1");
 });
 
 Deno.test("should increment version v1.0.0-alpha.0 to v1.0.0 if the next is a major release", () => {
