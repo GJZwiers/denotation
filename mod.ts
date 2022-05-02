@@ -72,9 +72,12 @@ export async function main(options: Options) {
     );
   }
 
+  const prerelease = (options.prerelease) ? "--prerelease" : "";
+
   await spawnProcess("gh", [
     "release",
     "create",
+    prerelease,
     "--draft",
     "--generate-notes",
     nextVersion,
