@@ -44,6 +44,10 @@ export async function main(options: Options) {
     throw new Error(`Invalid semantic versioning format for tag: ${tag}`);
   }
 
+  if (!semver.groups.v) {
+    semver.groups.v === "";
+  }
+
   if (semver.groups.pre) {
     console.log(semver.groups.pre);
   }
