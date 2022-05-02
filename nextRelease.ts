@@ -50,7 +50,7 @@ export function nextRelease(
         const match = groups.pre.match(/\d$/);
         if (!match) {
           throw new Error(
-            `Could not match pre-release patch number in pre-release group:${groups.pre}.
+            `Could not match pre-release patch number in pre-release group: ${groups.pre}.
             This may be due to an unsupported pre-release format.`,
           );
         }
