@@ -13,6 +13,20 @@ pipeline. The next semantic version is determined by
 - `deno` 1.21 or higher
 - `git` and `gh` (available by default in GitHub Actions)
 
+## Installation
+
+The program can be invoked directly via URL or installed as a CLI. The default
+name when installing is `denotation`, but a custom name can be chosen.
+
+```
+deno run --allow-run='gh,git' --unstable https://deno.land/x/denotation@v0.4.2/cli.ts -- --help
+```
+
+```
+deno install --allow-run='gh,git' --unstable -n denote https://deno.land/x/denotation@v0.4.2/cli.ts
+denote --help
+```
+
 ## Usage
 
 When the script runs it will look at the commits made since the last git tag,
@@ -38,8 +52,7 @@ jobs:
       - uses: denoland/setup-deno@v1.1.0
         with:
           deno-version: v1.x.x
-      - run: |
-          deno run --allow-run='gh,git' --unstable https://deno.land/x/denotation@v0.4.0/cli.ts
+      - run: deno run --allow-run='gh,git' --unstable https://deno.land/x/denotation@v0.4.2/cli.ts
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # GitHub Actions built-in variable.
 ```
