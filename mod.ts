@@ -72,13 +72,13 @@ export async function main(options: Options) {
     );
   }
 
-  await spawnProcess("gh", [
-    "release",
-    "create",
-    "--draft",
-    "--generate-notes",
-    nextVersion,
-  ]);
+  // await spawnProcess("gh", [
+  //   "release",
+  //   "create",
+  //   "--draft",
+  //   "--generate-notes",
+  //   nextVersion,
+  // ]);
 
   await writeAll(Deno.stdout, new TextEncoder().encode(nextVersion));
 }
