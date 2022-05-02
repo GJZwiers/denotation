@@ -17,68 +17,51 @@ export function nextRelease(
 ) {
   let nextVersion;
 
-  if (
-    opts.current === ReleaseType.Release &&
-    opts.next === ReleaseType.Prerelease
-  ) {
-    if (opts.increment === VersionIncrement.Patch) {
-      nextVersion = `${groups.v}${groups.major}.${groups.minor}.${
-        (parseInt(groups.patch) + 1).toString()
-      }-alpha.0`;
-    } else if (opts.increment === VersionIncrement.Minor) {
-      nextVersion = `${groups.v}${groups.major}.${
-        (parseInt(groups.minor) + 1).toString()
-      }.0-alpha.0`;
-    } else if (opts.increment === VersionIncrement.Major) {
-      nextVersion = `${groups.v}${groups.major = (parseInt(groups.major) + 1)
-        .toString()}.0.0-alpha.0`;
-    }
-  } else if (
-    opts.current === ReleaseType.Prerelease &&
-    opts.next === ReleaseType.Prerelease
-  ) {
-    const digit = groups.pre.match(/\d$/); // -alpha.0
-    if (!digit) {
-      throw new Error("Error while matching prerelease digit");
-    }
-    const match = digit[0];
-
-    if (opts.increment === VersionIncrement.Patch) {
-      nextVersion =
-        `${groups.v}${groups.major}.${groups.minor}.${groups.patch}-alpha.${
-          (parseInt(match) + 1).toString() // -alpha.1
-        }`;
-    } else if (opts.increment === VersionIncrement.Minor) {
-      nextVersion = `${groups.v}${groups.major}.${
-        (parseInt(groups.minor) + 1).toString()
-      }.0-alpha.0`;
-    } else if (opts.increment === VersionIncrement.Major) {
-      nextVersion = `${groups.v}${
-        (parseInt(groups.major) + 1).toString()
-      }.0.0-alpha.0`;
-    }
-  } else if (
-    opts.current === ReleaseType.Prerelease && opts.next === ReleaseType.Release
-  ) {
-    if (opts.increment === VersionIncrement.Patch) {
-      nextVersion =
-        `${groups.v}${groups.major}.${groups.minor}.${groups.patch}`;
-    } else if (opts.increment === VersionIncrement.Minor) {
-      nextVersion = `${groups.v}${groups.major}.${groups.minor}.0`;
-    } else if (opts.increment === VersionIncrement.Major) {
+  if (opts.increment === VersionIncrement.Major) {
+    if (
+      opts.current === ReleaseType.Prerelease &&
+      opts.next === ReleaseType.Release
+    ) {
       nextVersion = `${groups.v}${groups.major}.0.0`;
+    } else {
+      groups.major = (parseInt(groups.major) + 1).toString();
+      const suffix = (opts.next === ReleaseType.Release)
+        ? ".0.0"
+        : ".0.0-alpha.0";
+      nextVersion = `${groups.v}${groups.major}${suffix}`;
     }
-  } else {
-    if (opts.increment === VersionIncrement.Patch) {
-      nextVersion = `${groups.v}${groups.major}.${groups.minor}.${
-        (parseInt(groups.patch) + 1).toString()
-      }`;
-    } else if (opts.increment === VersionIncrement.Minor) {
-      nextVersion = `${groups.v}${groups.major}.${
-        (parseInt(groups.minor) + 1).toString()
-      }.0`;
-    } else if (opts.increment === VersionIncrement.Major) {
-      nextVersion = `${groups.v}${(parseInt(groups.major) + 1).toString()}.0.0`;
+  } else if (opts.increment === VersionIncrement.Minor) {
+    if (
+      opts.current === ReleaseType.Prerelease &&
+      opts.next === ReleaseType.Release
+    ) {
+      nextVersion = `${groups.v}${groups.major}.${groups.minor}.0`;
+    } else {
+      groups.minor = (parseInt(groups.minor) + 1).toString();
+      const suffix = (opts.next === ReleaseType.Release) ? ".0" : ".0-alpha.0";
+      nextVersion = `${groups.v}${groups.major}.${groups.minor}${suffix}`;
+    }
+  } else if (opts.increment === VersionIncrement.Patch) {
+    if (opts.current === ReleaseType.Prerelease) {
+      if (opts.next === ReleaseType.Release) {
+        nextVersion =
+          `${groups.v}${groups.major}.${groups.minor}.${groups.patch}`;
+      } else {
+        const match = groups.pre.match(/\d$/);
+        if (!match) {
+          throw new Error("Error while matching prerelease digit");
+        }
+        const prereleasePatch = match[0];
+        nextVersion =
+          `${groups.v}${groups.major}.${groups.minor}.${groups.patch}-alpha.${
+            (parseInt(prereleasePatch) + 1).toString()
+          }`;
+      }
+    } else {
+      groups.patch = (parseInt(groups.patch) + 1).toString();
+      const suffix = (opts.next === ReleaseType.Release) ? "" : "-alpha.0";
+      nextVersion =
+        `${groups.v}${groups.major}.${groups.minor}.${groups.patch}${suffix}`;
     }
   }
 
