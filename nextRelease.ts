@@ -63,6 +63,7 @@ export function nextRelease(
       nextVersion =
         `${groups.v}${groups.major}.${groups.minor}.${groups.patch}${suffix}`;
     }
+  }
 
   return nextVersion;
 }
