@@ -49,7 +49,10 @@ export function nextRelease(
       } else {
         const match = groups.pre.match(/\d$/);
         if (!match) {
-          throw new Error("Error while matching prerelease digit");
+          throw new Error(
+            `Could not match pre-release patch number in pre-release group: ${groups.pre}.
+            This may be due to an unsupported pre-release format.`,
+          );
         }
         const prereleasePatch = match[0];
         nextVersion =
