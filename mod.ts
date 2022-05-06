@@ -10,7 +10,7 @@ export async function main(options: Options) {
     "describe",
     "--tags",
     "--abbrev=0",
-    "HEAD^",
+    "HEAD",
   ]);
 
   const decoder = new TextDecoder();
@@ -31,6 +31,12 @@ export async function main(options: Options) {
   const commits = decoder.decode(gitLogStdout)
     .split(commitSeparator)
     .filter((element) => element); // Filter empty strings.
+
+  if (commits.length === 0) {
+    throw new Error(
+      "No commits have been made since the last tag was created.",
+    );
+  }
 
   const increments: VersionIncrement[] = commits.map(getIncrementType);
 

@@ -19,11 +19,11 @@ The program can be invoked directly via URL or installed as a CLI. The default
 name when installing is `denotation`, but a custom name can be chosen.
 
 ```
-deno run --allow-run='gh,git' --unstable https://deno.land/x/denotation@v0.4.5/cli.ts -- --help
+deno run --allow-run='gh,git' --unstable https://deno.land/x/denotation@v0.4.6/cli.ts -- --help
 ```
 
 ```
-deno install --allow-run='gh,git' --unstable -n denote https://deno.land/x/denotation@v0.4.5/cli.ts
+deno install --allow-run='gh,git' --unstable -n denote https://deno.land/x/denotation@v0.4.6/cli.ts
 denote --help
 ```
 
@@ -52,7 +52,7 @@ jobs:
       - uses: denoland/setup-deno@v1.1.0
         with:
           deno-version: v1.x.x
-      - run: deno run --allow-run='gh,git' --unstable https://deno.land/x/denotation@v0.4.5/cli.ts
+      - run: deno run --allow-run='gh,git' --unstable https://deno.land/x/denotation@v0.4.6/cli.ts
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # GitHub Actions built-in variable.
 ```
