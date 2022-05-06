@@ -99,7 +99,7 @@ export async function main(options: Options) {
       nextVersion,
     ];
 
-  // await spawnProcess("gh", args);
+  await spawnProcess("gh", args);
 
   await writeAll(Deno.stdout, new TextEncoder().encode(nextVersion));
 }
