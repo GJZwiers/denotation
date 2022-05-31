@@ -6,7 +6,7 @@ export class UnconventionalCommitError extends Error {
   }
 }
 
-const re =
+export const re =
   /^ ?(?<type>build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test|¯\\_\(ツ\)_\/¯)(?<scope>\(\w+\)?((?=:\s)|(?=!:\s)))?(?<breaking>!)?(?<subject>:\s.*)?|^(?<merge>Merge \w+)/;
 
 export function getIncrementType(commit: string) {

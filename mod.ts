@@ -1,6 +1,6 @@
 import { Options } from "./cli.ts";
 import { writeAll } from "./deps.ts";
-import { getIncrementType } from "./getIncrementType.ts";
+import { getIncrementType, re } from "./getIncrementType.ts";
 import { highestIncrement, VersionIncrement } from "./incrementVersion.ts";
 import { nextRelease } from "./nextRelease.ts";
 import { spawnProcess } from "./spawnProcess.ts";
@@ -82,6 +82,36 @@ export async function main(options: Options) {
     );
   }
 
+  if (options.filterNotes) {
+    const notes = createNotes(commits);
+    console.log(notes);
+    // TODO: refactor
+    const args = (options.prerelease)
+      ? [
+        "release",
+        "create",
+        "--prerelease",
+        "--draft",
+        "--title",
+        nextVersion,
+        "--notes",
+        notes,
+        nextVersion,
+      ]
+      : [
+        "release",
+        "create",
+        "--draft",
+        "--title",
+        nextVersion,
+        "--notes",
+        notes,
+        nextVersion,
+      ];
+
+    return await spawnProcess("gh", args);
+  }
+
   const args = (options.prerelease)
     ? [
       "release",
@@ -102,4 +132,29 @@ export async function main(options: Options) {
   await spawnProcess("gh", args);
 
   await writeAll(Deno.stdout, new TextEncoder().encode(nextVersion));
+}
+
+function createNotes(commits: string[]): string {
+  let notes = "## Release Notes\n\n";
+
+  for (const commit of commits) {
+    const cleanCommitMatch = commit.replace(/\n/g, "").match(re);
+    if (!cleanCommitMatch || !cleanCommitMatch.groups) {
+      continue;
+    }
+
+    if (
+      cleanCommitMatch.groups.scope !== "ci" && (
+        cleanCommitMatch.groups.type === "fix" ||
+        cleanCommitMatch.groups.type === "feat" ||
+        cleanCommitMatch.groups.type === "perf"
+      )
+    ) {
+      console.log(cleanCommitMatch);
+      // Add Markdown list element to notes.
+      notes += "- " + cleanCommitMatch[0];
+    }
+  }
+  console.log(notes);
+  return notes;
 }
