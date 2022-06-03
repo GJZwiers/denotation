@@ -15,6 +15,7 @@ Deno.test("excludes dev-only commits", () => {
     "build: added something something",
     "fix(ci): fixed it!",
     "chore: clean up code",
+    "refactor(mod): much better!",
     "how did I get in here",
   ]);
   assertEquals(notes, header);
