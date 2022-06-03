@@ -4,7 +4,7 @@ export function createNotes(commits: string[]): string {
   let notes = "## Release Notes\n\n";
 
   for (const commit of commits) {
-    const cleanCommitMatch = commit.replace(/\n/g, "").match(re);
+    const cleanCommitMatch = commit.match(re);
 
     if (!cleanCommitMatch || !cleanCommitMatch.groups) {
       continue;
