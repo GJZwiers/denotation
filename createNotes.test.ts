@@ -15,10 +15,19 @@ Deno.test("excludes dev-only commits", () => {
     "build: added something something",
     "fix(ci): fixed it!",
     "chore: clean up code",
-    "refactor(mod): much better!",
+    "refactor(module): much better!",
     "how did I get in here",
   ]);
   assertEquals(notes, header);
+});
+
+Deno.test("adds only the commit header to release notes", () => {
+  const notes = createNotes([
+    `fix: fixed it!
+    
+    Description of what was fixed`,
+  ]);
+  assertEquals(notes, header + "- " + "fix: fixed it!\n");
 });
 
 Deno.test("adds valid conventional commit type and scope to the notes as a markdown list item", () => {
