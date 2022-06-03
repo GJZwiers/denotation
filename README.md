@@ -34,6 +34,21 @@ for example `v1.0.0`. Depending on the conventional commit messages it will
 increment with either a patch (`v1.0.1`), minor version (`v1.1.0`) or major
 version (`v2.0.0`).
 
+Here are some commit examples:
+
+`fix: throw error on divide by zero` -> patch increment
+`feat: look a new shiny object!` -> minor increment
+`feat!: change parameter type number to string` -> major increment
+`feat(myScope)!: change parameter type number to string` -> major increment
+
+```
+feat: change parameter type number to string
+
+BREAKING CHANGE: existing calls to myFunction will need to be updated.
+```
+
+-> major increment
+
 The following example shows how to use `denotation` as a step in GitHub Actions
 to create a release:
 
@@ -69,11 +84,17 @@ Use the `--prerelease` option to make the next release a pre-release.
 If you are on `v1.0.0`, and you make a `fix:` commit for example, with
 `--prerelease` the next version will become `v1.0.1-alpha.0`.
 
+## Filter release notes
+
+You can use `--filter-notes` to create custom release notes that don't contain
+certain dev-only commits, such as `chore:`, `fix(ci)` and `build`. Only `fix`,
+`feat` and `perf` commits will be kept in the release notes.
+
+Currently this option is experimental.
+
 ## Roadmap
 
 - Support Continuous Deployment, where release is immediate
-- Support filtering certain commits from release notes (such as `chore` and
-  `ci`)
 - Support custom version increments based on commit scope like `feat(ci)`
   incrementing as a patch instead of a minor release.
 

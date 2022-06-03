@@ -1,4 +1,5 @@
 import { Options } from "./cli.ts";
+import { createNotes } from "./createNotes.ts";
 import { writeAll } from "./deps.ts";
 import { getIncrementType } from "./getIncrementType.ts";
 import { highestIncrement, VersionIncrement } from "./incrementVersion.ts";
@@ -80,6 +81,37 @@ export async function main(options: Options) {
     throw new Error(
       "Something went wrong determining the next semantic version.",
     );
+  }
+
+  if (options.filterNotes) {
+    const notes = createNotes(commits);
+    // TODO: refactor
+    const args = (options.prerelease)
+      ? [
+        "release",
+        "create",
+        "--prerelease",
+        "--draft",
+        "--title",
+        nextVersion,
+        "--notes",
+        notes,
+        nextVersion,
+      ]
+      : [
+        "release",
+        "create",
+        "--draft",
+        "--title",
+        nextVersion,
+        "--notes",
+        notes,
+        nextVersion,
+      ];
+
+    await spawnProcess("gh", args);
+
+    return await writeAll(Deno.stdout, new TextEncoder().encode(nextVersion));
   }
 
   const args = (options.prerelease)
