@@ -8,7 +8,7 @@ export interface Options {
 
 await new Command()
   .name("denotation")
-  .version("v0.4.6")
+  .version("v0.5.0")
   .description("Create semantic releases based on conventional commit history.")
   .option(
     "--prerelease",
