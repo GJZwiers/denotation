@@ -109,7 +109,9 @@ export async function main(options: Options) {
         nextVersion,
       ];
 
-    return await spawnProcess("gh", args);
+    await spawnProcess("gh", args);
+
+    return await writeAll(Deno.stdout, new TextEncoder().encode(nextVersion));
   }
 
   const args = (options.prerelease)
