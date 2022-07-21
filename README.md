@@ -1,7 +1,7 @@
 # Denotation
 
 [![deno module](https://shield.deno.dev/x/denotation)](https://deno.land/x/denotation)
-![deno compatibility](https://shield.deno.dev/deno/^1.21)
+![deno compatibility](https://shield.deno.dev/deno/^1.24)
 
 `denotation` is a tool for versioning and creating GitHub releases, which can
 run as part of an automatic Continuous Integration & Continuous Delivery (CI/CD)
