@@ -9,10 +9,10 @@ jobs:
     strategy:
       matrix:
         os:
-          - ubuntu-20.04
+          - ubuntu-22.04
     steps:
-      - uses: actions/checkout@v2
-      - uses: denoland/setup-deno@v1.1.0
+      - uses: actions/checkout@v3
+      - uses: denoland/setup-deno@v1.1.1
         with:
           deno-version: v1.x.x
       - run: deno fmt --check
