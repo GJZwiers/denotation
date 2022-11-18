@@ -1,7 +1,7 @@
 # Denotation
 
 [![deno module](https://shield.deno.dev/x/denotation)](https://deno.land/x/denotation)
-![deno compatibility](https://shield.deno.dev/deno/^1.24)
+![deno compatibility](https://shield.deno.dev/deno/^1.28)
 
 `denotation` is a tool for versioning and creating GitHub releases, which can
 run as part of an automatic Continuous Integration & Continuous Delivery (CI/CD)
@@ -10,8 +10,8 @@ pipeline. The next semantic version is determined by
 
 ## Requirements
 
-- `deno` 1.21 or higher
-- `git` and `gh` (available by default in GitHub Actions)
+- `deno` 1.28 or higher
+- `git` and GitHub CLI `gh` installed (available by default in GitHub Actions)
 
 ## Installation
 
@@ -19,11 +19,11 @@ The program can be invoked directly via URL or installed as a CLI. The default
 name when installing is `denotation`, but a custom name can be chosen.
 
 ```
-deno run --allow-run='gh,git' --unstable https://deno.land/x/denotation@v0.5.3/cli.ts -- --help
+deno run --allow-run='gh,git' --unstable https://deno.land/x/denotation@v0.5.4/cli.ts -- --help
 ```
 
 ```
-deno install --allow-run='gh,git' --unstable -n denote https://deno.land/x/denotation@v0.5.3/cli.ts
+deno install --allow-run='gh,git' --unstable -n denote https://deno.land/x/denotation@v0.5.4/cli.ts
 denote --help
 ```
 
@@ -70,7 +70,7 @@ jobs:
       - uses: denoland/setup-deno@v1.1.0
         with:
           deno-version: v1.x.x
-      - run: deno run --allow-run='gh,git' --unstable https://deno.land/x/denotation@v0.5.3/cli.ts
+      - run: deno run --allow-run='gh,git' --unstable https://deno.land/x/denotation@v0.5.4/cli.ts
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # GitHub Actions built-in variable.
 ```
