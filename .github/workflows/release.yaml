@@ -4,13 +4,13 @@ on: workflow_dispatch
 
 jobs:
   release:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     environment: release
     steps:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - uses: denoland/setup-deno@v1.1.0
+      - uses: denoland/setup-deno@v1.1.1
         with:
           deno-version: v1.x.x
       - run: deno run --allow-run='gh,git' --unstable cli.ts --filter-notes
